@@ -1,16 +1,26 @@
+#
+# part of the glossy transparency repo
+# github.com/jessicakay/glossy
+#
+# jessdkant.bsky.social
+#
+
 # install packages
 
 sudo apt install ffmpeg jq xclip
 
 # find location of MP4 file on page
-
 read -p "Target (url): " targ && ffmpeg -i $(curl -s $targ | grep "\Khttps.*?mp4" -oPm 1) -c copy outfile.mp4 
 
 # find stream and rip to ffmpeg 
 read -p "Target (url): " targ && ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u" -oP | grep "https" -m 1) -c copy outfile.mp4
 
-# pull whole data model from Sliq, only show first 100 characters
+# granicus
+read -p "Target (url): " targ && ffmpeg -i $(curl $targ -L |
+	tr "\'" "\n" |  grep "\Khttp.*?m3u?8" -Poz |
+	grep "m3u" -z -m 1) -c copy out.mp4
 
+# pull whole data model from Sliq, only show first 100 characters
 grep '(?s)dataModel = \{.*?\};' outfile_temp -Poz | tail +2 | head -c 100
 
 # extract transcript from embedded VTT subtitles file 
@@ -40,26 +50,24 @@ grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
 	jq -c '.en[] | {Begin,Content} ' | tr "{|}" "\ " | tr ",|\"" " "
 
 # version 3
-grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |   jq '.en | select(.Content | contains("$kw")) | {Begin, Content}'
-
+grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |  jq '.en | select(.Content | contains("$kw")) | {Begin, Content}'
 
 # testing azleg.gov/actvlive
 curl azleg.gov/actvlive | tr "\'" "\n" |  grep "\Khttp.*?media.*?m3u?8" -Poz
 
-read -p "Target (url): " targ && ffmpeg -i $(curl $targ -L | tr "\'" "\n" |  grep "\Khttp.*?m3u?8" -Poz) -c copy out.mp4
+# rips AZleg livestream in real-time, storing output in 20 minute chunks
+
+read -p "choose filename prefix: " outNAME &&
+targURL=$(curl -L $targ | tr "\'" "\n" |
+	grep "\Khttp.*?media.*?m3u?8" -Poz | tr -d '\0') &&
+	ffmpeg -i $targURL -c copy -segment_time 00:20:00 -f segment $outNAME%03d.mp4
 
 # for rhode island
 
-curl https://capitoltvri.cabcast.tv/watch/stream/2 |  tr "\"" "\n" | grep  "\Khttps.*?1080.*?m3u?8" -Poz -m 1
+curl $targ |  tr "\"" "\n" | grep  "\Khttps.*?1080.*?m3u?8" -Poz -m 1
 
 # stream counter
 curl $targ |  tr "\"" "\n" | grep '^https.*?m..?.$' -E | printf "there are $(wc -l) streams"
-
-# granicus
-read -p "Target (url): " targ && ffmpeg -i $(curl $targ -L |
-	tr "\'" "\n" |  grep "\Khttp.*?m3u?8" -Poz |
-	grep "m3u" -z -m 1) -c copy out.mp4
-
 
 curl $targ | grep "(?s)\Khttp[a-zA-Z0-9./]+m3u?8" -Poz -m 1
 
