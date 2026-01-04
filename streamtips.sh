@@ -64,6 +64,11 @@ targURL=$(curl -L $targ | tr "\'" "\n" |
 	ffmpeg -i $targURL -c copy -segment_time 00:20:00 -f -reset_timestamps 1 \
 	segment $outNAME%03d.mp4
 
+# merge segments into single file and create audio-only file for easy transcription
+echo $(ls test*) | sed 's/ /\n/g' |  sed 's/^/file /g' > temp && 
+ffmpeg -f concat -i temp -c copy "${outNAME}_all.mp4" && rm temp &&
+ffmpeg -i "${outNAME}_all.mp4" -vn -ac 2 -b:a 192k "${outNAME}_all.mp3"
+
 # for rhode island
 
 curl $targ |  tr "\"" "\n" | grep  "\Khttps.*?1080.*?m3u?8" -Poz -m 1
