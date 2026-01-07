@@ -32,12 +32,30 @@ alias expvtt="curl $(xclip -selection clipboard -o) | grep -i '[a-z]' | sed  's/
 # extract subtitles, concatenate into and search transcript for keywords:
 # for Sliq platform
 
+# simple version
 read -p "Target (url): " targ && read -p "Keyword: " kw &&
     printf "\n\n" && curl $targ -o outfile_temp &&
 	printf "\n results: \n\n" &&
 	grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
 	jq -c '.en[] | {Begin,Content} ' | tr "{|}" "\ " | tr ",|\"" " " |
 	grep -i $kw && printf "\n"
+
+
+# empty keyword saves transcript to filename using last 16 characters of URL string
+read -p "Target (url): " targ && read -p "Keyword [blank for save transcript]: " kw &&
+if [$kw == ""]; then
+		printf "\n\n" && curl $targ -o outfile_temp &&
+		printf "\n results [no keyword]: \n\n" &&
+		grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
+		jq -c '.en[] | {Begin,Content} ' > $(echo $targ | sed 's/[^a-z0-9]//gI' | tail -c 16)_transcript
+		printf "\n\nsaved to "
+else
+		printf "\n\n" && curl $targ -o outfile_temp &&
+		printf "\n results: \n\n" &&
+		grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
+		jq -c '.en[] | {Begin,Content} ' | tr "{|}" "\ " | tr ",|\"" " " |
+		grep -i $kw && printf "\n"
+fi
 
 
 # extract transcript from Sliq
