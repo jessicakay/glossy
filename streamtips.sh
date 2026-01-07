@@ -98,6 +98,7 @@ curl $targ |  tr "\"" "\n" | grep  "\Khttps.*?1080.*?m3u?8" -Poz -m 1
 # stream counter
 curl $targ |  tr "\"" "\n" > counter_temp
 	sed 's/,/\n/g' counter_temp | grep '^https.*?m3u?8$' -E | \
-	printf "there are $(wc -l) m3u/m3u8 streams" &&
+	printf "\n\tThere are $(wc -l) m3u/m3u8 streams\n" &&
 	grep -P "http" counter_temp | grep "mp4$" |
-		printf "$(wc -l) mp4 files found\n"
+		printf "\t$(wc -l) mp4 files found\n" &&
+		printf "\t$(grep -Ec '.pdf$' counter_temp) pdf files found.\n\n"
