@@ -44,11 +44,13 @@ read -p "Target (url): " targ && read -p "Keyword: " kw &&
 # empty keyword saves transcript to filename using last 16 characters of URL string
 read -p "Target (url): " targ && read -p "Keyword [blank for save transcript]: " kw &&
 if [$kw == ""]; then
-		printf "\n\n" && curl $targ -o outfile_temp &&
-		printf "\n results [no keyword]: \n\n" &&
+		transcript_filename=$(echo $targ | sed 's/[^a-z0-9]//gI' | tail -c 16)
+		printf "\n\n" && curl $targ -o outfile_temp
+		printf "\n results [no keyword]: \n\n"
 		grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
-		jq -c '.en[] | {Begin,Content} ' > $(echo $targ | sed 's/[^a-z0-9]//gI' | tail -c 16)_transcript
-		printf "\n\nsaved to "
+		jq -c '.en[] | {Begin,Content} ' > "${transcript_filename}_transcript.JSON"
+		cat ${transcript_filename}_transcript.JSON | jq -r '.Content' | tr "\n" "\ " > "${transcript_filename}_raw.txt"
+		printf "\n\nsaved to \"${transcript_filename}\".\n"
 else
 		printf "\n\n" && curl $targ -o outfile_temp &&
 		printf "\n results: \n\n" &&
