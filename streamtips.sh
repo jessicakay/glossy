@@ -41,26 +41,6 @@ read -p "Target (url): " targ && read -p "Keyword: " kw &&
 	grep -i $kw && printf "\n"
 
 
-# empty keyword saves transcript to filename using last 16 characters of URL string
-read -p "Target (url): " targ && read -p "Keyword (blank for save transcript): " kw
-if [ $kw == "" ]; then
-		transcript_filename=$(echo $targ | sed 's/[^a-z0-9]//gI' | tail -c 16)
-		printf "\n\n" && curl $targ -o outfile_temp
-		grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
-		jq -c '.en[] | {Begin,Content} ' > "${transcript_filename}_transcript.JSON"
-		cat ${transcript_filename}_transcript.JSON | \
-			jq -r '.Content' | \
-			tr "\n" "\ " > "${transcript_filename}_raw.txt"
-		printf "\n\nsaved to \"${transcript_filename}\".\n"
-else
-		printf "\n\n" && curl $targ -o outfile_temp &&
-		printf "\n results: \n\n" &&
-		grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
-		jq -c '.en[] | {Begin,Content} ' |
-			tr "{|}" "\ " | tr ",|\"" " " | grep -i $kw
-		printf "\n"
-fi
-
 
 # extract transcript from Sliq
 # version 1
@@ -93,23 +73,6 @@ ffmpeg -i "${outNAME}_all.mp4" -vn -ac 2 -b:a 192k "${outNAME}_all.mp3"
 
 # for rhode island
 # RI Capital TV loads *all* media files into source
+# see: stream_counter.sh for full script
 curl $targ |  tr "\"" "\n" | grep  "\Khttps.*?1080.*?m3u?8" -Poz -m 1
 
-# stream counter based on RI capital TV
-# page lists all media content in JSON in source
-default_URL="capitoltvri.cablecast.tv/watch/stream/1"
-if ! [[ -v targ &&  "${#targ}" -gt 0 ]]; then
-	targ=$default_URL
-	printf "\n\t"; else printf "\n\t $(echo "[ current  URL: "  $targ "]") \n\t" ;
-fi
-read -p " -> Target (url): " targ
-targ="${targ:=$default_URL}"
-curl $targ |  tr "\"" "\n" > counter_temp
-	sed 's/,/\n/g' counter_temp | grep '^https.*?m3u?8$' -E | \
-	printf "\n\tThere are $(wc -l) m3u/m3u8 streams\n" &&
-	grep -P "http" counter_temp |
-		printf "\t$(grep "mp4$" -c) mp4 files found\n" &&
-		printf "\t$(grep -Ec '.pdf$' counter_temp) pdf files found.\n\n\tlivestreams:\n\n" &&
-		sed  's/\\//g' counter_temp | grep "http.*live?stream=[0-9+]" -o |
-			sort | uniq | printf "$(grep -Po "(?s)https:/\/\\K.*" |
-			sed 's/^/\t-> /g')\n\n"
