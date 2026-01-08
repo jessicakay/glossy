@@ -63,8 +63,8 @@ read -p "Target (url): " targ &&
 read -p "choose filename prefix: " outNAME &&
 targURL=$(curl -L $targ | tr "\'" "\n" |
 	grep "\Khttp.*?media.*?m3u?8" -Poz | tr -d '\0') &&
-	ffmpeg -i $targURL -c copy -segment_time 00:20:00 -f -reset_timestamps 1 \
-	segment $outNAME%03d.mp4
+	ffmpeg -i $targURL -c copy -segment_time 00:20:00 -reset_timestamps 1 \
+	-f segment $outNAME%03d.mp4
 
 # merge segments into single file and create audio-only file for easy transcription
 echo $(ls $outNAME*) | sed 's/ /\n/g' |  sed 's/^/file /g' > temp && 

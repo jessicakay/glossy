@@ -6,7 +6,7 @@
 
     simple examples in Bash of using ffmpeg to download livestreams and hosted videos
 
-### other _transcript_tools
+### other scripts
 
 * _[transcript_tools.sh](https://github.com/jessicakay/glossy/blob/main/transcript_tools.sh)_
 
