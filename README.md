@@ -4,7 +4,8 @@
 
 * _[streamtips.sh](https://github.com/jessicakay/glossy/blob/main/streamtips.sh)_
 
-        * simple examples in Bash of using ffmpeg to download livestreams and hosted videos. Use to follow along with [https://https://jessk.org/blog/streamripping-democracy](tutorial on blog).
+        * simple examples in Bash of using ffmpeg to download livestreams and hosted videos.
+        * use to follow along tutorial on blog
 
 ### other scripts
 
