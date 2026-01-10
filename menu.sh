@@ -1,7 +1,7 @@
 
-echo -e "choose session type\n"
-read -p $'[L]ocal .env\n[P]rofile ~/.bashrc\n[B]oth>' s_c
 
+echo -e "\n[L]ocal .env\n[P]rofile ~/.bashrc\n[B]oth"
+read -p $'\nchoose session type: ' s_c
 if [[ $s_c == "b" ]] || [[ $s_c == "l" ]]; then
     if [[ -z $(alias | grep "liverip") ]]; then
         alias liverip="source livestream_rip.sh";
