@@ -31,3 +31,4 @@ if (( $(ls act* | wc -l) > 1 )); then
     ffmpeg -f concat -i temp -c copy "${outNAME}_all.mp4" && rm temp
     ffmpeg -i "${outNAME}_all.mp4" -vn -ac 2 -b:a 192k "${outNAME}_all.mp3";
 fi
+
