@@ -1,7 +1,13 @@
+#
+# livestream ripper
+# part of the github.com/jessicakay/glossy repo
+#
+# https://jessk.org/blog/streamripping-democracy
+# jessdkant.bsky.social
+#
 
-# rips AZleg livestream in real-time, storing output in 20 minute chunks
 # version 1
-
+#
 # read -p "Target (url): " targ
 # read -p "choose filename prefix: " outNAME
 # targURL=$(curl -L $targ | tr "\'" "\n" |
@@ -10,6 +16,7 @@
 #	segment $outNAME%03d.mp4
 
 # version 2
+#
 read -p "Target (url): " targ
 read -p "choose filename prefix: " outNAME
 read -p "save every (in mins): " segSIZE
