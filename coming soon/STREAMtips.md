@@ -10,17 +10,17 @@
 
 * the majority of the rest of the repo are extra features wrapped around these simple comands. Copy them and paste into a text editor or directly into the terminal
 
-        # find mp4 on page, copy from ffmpeg
+    find mp4 on page, copy from ffmpeg
 
         read -p "Target (url): " targ && ffmpeg -i $(curl -s $targ |
         grep "\Khttps.*?mp4" -oPm 1) -c copy outfile.mp4
 
-        #  find stream and rip to ffmpeg
+    find stream and rip to ffmpeg
 
         read -p "Target (url): " targ && ffmpeg -i $(curl $targ | \
         grep "\Khttps.*?m3u" -oP | grep "https" -m 1) -c copy outfile.mp4
 
-        # granicus
+     granicus
 
         read -p "Target (url): " targ && ffmpeg -i $(curl $targ -L |
         tr "\'" "\n" |  grep "\Khttp.*?m3u?8" -Poz |
