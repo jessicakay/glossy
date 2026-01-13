@@ -101,7 +101,7 @@
 
 ### examples of more complex scripts using code snippets above
 
-* _[livestream_rip.sh](https://github.com/jessicakay/glossy/blob/main/livestream_rip.sh)_
+* _[livestream_rip.sh](https://github.com/jessicakay/glossy/blob/main/scripts/livestream_rip.sh)_
 
     all-in-one script:
 
@@ -111,15 +111,15 @@
     * merges all segments into unified files
     * extracts audio into separate mp3 for easy transcription
 
-* _[transcript_tools.sh](https://github.com/jessicakay/glossy/blob/main/transcript_tools.sh)_
+* _[transcript_tools.sh](https://github.com/jessicakay/glossy/blob/main/scripts/transcript_tools.sh)_
 
     * extracts transcripts from Sliq platform, VTT files
 
-* _[stream_counter.sh](https://github.com/jessicakay/glossy/blob/main/stream_counter.sh)_
+* _[stream_counter.sh](https://github.com/jessicakay/glossy/blob/main/scripts/stream_counter.sh)_
 
     * maps out site and displays livestreams, based on Rhode Island Capital TV website
 
-* _[detector_rip.sh](https://github.com/jessicakay/glossy/blob/main/_detector.sh)_
+* _[detector_rip.sh](https://github.com/jessicakay/glossy/blob/main/scripts/detector.sh)_
 
     all-in-one script:
 
