@@ -2,6 +2,10 @@
 
 ### tips from [jessk.org/blog/streamripping-democracy](https://https://jessk.org/blog/streamripping-democracy)
 
+For background on this project, check out the [blog post](https://https://jessk.org/blog/streamripping-democracy) above. In short: while there are amazing ffmpeg wrappers like yt-dlp out there, they tend to fall short when it comes to legislative, municipal and judicial hearings, and typically don't include tools for transcription.
+
+The [first section](https://github.com/jessicakay/glossy) is meant for users to follow along to the tutorial and learn the basics of archiving videos and downloading livestreams. THe second, however, contains scripts in progress for expanding these capabilities and automating the process of identifying platforms and configuring ffmpeg. You can find those [here](https://github.com/jessicakay/glossy#other-scripts).
+
 ## install packages
 
 * code snippets are written in bash. You can either use them natively in linux (tested on ubuntu), or download Cygwin or Linux Subsystem for Linux (WSL). The syntax will be different for bash commands but once pacakges are installed, the rest of this should work on any linux shell wth minimal tweaking.
