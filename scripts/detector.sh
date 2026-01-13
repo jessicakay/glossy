@@ -45,6 +45,17 @@ function grab_menu() {
 	esac
 	}
 
+function grab_inv(){
+	if ! [[ -z $(  curl -s $new_targ ) ]]; then
+		case "$file_fmt" in
+			a) targ=$new_targ ; ffmpeg -i $targ -vn -ac 2 -b:a 192k $outNAME.mp3 ;;
+			v) targ=$new_targ ; ffmpeg -i $targ -c copy $outNAME.mp4 ;;
+			b) targ=$new_targ ; ffmpeg -i $targ -c copy $outNAME.mp4 &&
+				ffmpeg -i $outNAME.mp4 -c:a -acodec libmp3lame -vn $outNAME.mp3 ;;
+		esac
+		fi
+		}
+
 if ! [[ -z $( echo $targ | grep "sliq" ) ]];
 	then printf "\n\t-> Sliq platform detected"
 	platform_type="sliq"
@@ -67,7 +78,7 @@ if  [[ -n $( echo $buffer | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) ]
 			b) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -c copy $outNAME.mp4 &&
 				ffmpeg -i $outNAME.mp4 -c:a -acodec libmp3lame -vn $outname.mp3
 				return ;;
-		esac
+			esac
 	else
 		printf "\n\t-! stream not found... \n";
 		file_enumerater
@@ -94,15 +105,22 @@ else
 			printf "\n\t ~ client ID $clientid\n\t ~ event ID $event_id\n\n\t ~ attempting to grab stream..\n\n"
 			new_targ="https://api.v3.invintus.com/StreamURI/hls/$clientid/$event_id/media.m3u8"
 			printf "\n$new_targ\n"
-			if ! [[ -z $(  curl -s $new_targ ) ]]; then
-				targ=$new_targ
-				ffmpeg -i $targ -c copy $outNAME.mp4
-			fi
-		elif ! [[ -z $(echo $buffer| grep -Pozi "ClientID=" ) ]]; then
+			grab_inv
+		elif ! [[ -z $(echo $buffer| grep -Pozi "ClientID=" ) ]] &&  [[ -z $(echo $targ | grep -Pozi "eventID=" | tr -d '\0' ) ]]; then
 			clientid="$(cat temp.txt | tr "\'" " " | grep -Pozi "ClientID\K.*?[0-9]+" | tr -d '\0' )"
 			event_id="$(cat temp.txt | tr "\'" " " | grep -Pozi "eventID.*?\K[0-9]+[^\{\}]" -m 1 | tr -d '\0' )"
 			printf "\n\t ~ client ID $clientid\n\t ~ event ID $event_id\n"
 			rm temp.txt
+		else
+			# some implementations use redirects, no-keepalive overrides throttling
+			curl -s -m 10 --no-keepalive -L $targ > temp.txt
+			clientid="$(cat temp.txt | tr "\'" " " | grep -Pozi "ClientID.*?\K[0-9:]+" -m 1 |  tr -d '\0:' )"
+			event_id="$(cat temp.txt | tr "\'" " " | grep -Pozi "event.*?\K[0-9:]+" -m 1 |  tr -d '\0' |
+				sed 's/:/\n/g' | grep "[0-9]+" -oP | uniq )"
+			printf "\n\t ~ client ID $clientid\n\t ~ event ID $event_id\n"
+			new_targ="https://api.v3.invintus.com/StreamURI/hls/$clientid/$event_id/media.m3u8"
+			printf "\n$new_targ\n"
+			grab_inv
 		fi
 	fi
 fi
