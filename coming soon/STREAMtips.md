@@ -4,6 +4,10 @@
 
 ## install packages
 
+* code snippets are written in bash. You can either use them natively in linux (tested on ubuntu), or download Cygwin or Linux Subsystem for Linux (WSL). The syntax will be different for bash commands but once pacakges are installed, the rest of this should work on any linux shell wth minimal tweaking.
+
+    for apt package manager:
+
         sudo apt install ffmpeg jq xclip
 
 ### basic scripts for downloading files
@@ -26,6 +30,7 @@
         tr "\'" "\n" |  grep "\Khttp.*?m3u?8" -Poz |
         grep "m3u" -z -m 1) -c copy out.mp4
 
+
 ### working with Sliq pages
 
 * these features are snippets of code for working wth Sliq, specifically around parsing subtitles and converting them to transcripts
@@ -34,7 +39,11 @@
 
         grep '(?s)dataModel = \{.*?\};' outfile_temp -Poz | tail +2 | head -c 100
 
-    extract transcript from embedded VTT subtitles file
+    extract transcript from Sliq 1
+
+        grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |  jq '.en | select(.Content | contains("$kw")) | {Begin, Content}'
+
+    extract transcript from VTT subtitles file
 
         curl $(targ) | grep -i '[a-z]' | sed  's/\r//g' | tr '\n' ' '
 
