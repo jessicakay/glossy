@@ -6,19 +6,21 @@
 
         sudo apt install ffmpeg jq xclip
 
-### basic scripts
+### basic scripts for downloading files
 
-* find mp4 on page, copy from ffmpeg
+* the majority of the rest of the repo are extra features wrapped around these simple comands. Copy them and paste into a text editor or directly into the terminal
 
-read -p "Target (url): " targ && ffmpeg -i $(curl -s $targ |
+        # find mp4 on page, copy from ffmpeg
+
+        read -p "Target (url): " targ && ffmpeg -i $(curl -s $targ |
         grep "\Khttps.*?mp4" -oPm 1) -c copy outfile.mp4
 
-* find stream and rip to ffmpeg
+        #  find stream and rip to ffmpeg
 
         read -p "Target (url): " targ && ffmpeg -i $(curl $targ | \
         grep "\Khttps.*?m3u" -oP | grep "https" -m 1) -c copy outfile.mp4
 
-* granicus
+        # granicus
 
         read -p "Target (url): " targ && ffmpeg -i $(curl $targ -L |
         tr "\'" "\n" |  grep "\Khttp.*?m3u?8" -Poz |
@@ -34,4 +36,5 @@ read -p "Target (url): " targ && ffmpeg -i $(curl -s $targ |
 
 * make shortcut to allow any user to expand subtitles of file with URL in clipboard
 
-        alias expvtt="curl $(xclip -selection clipboard -o) | grep -i '[a-z]' | sed  's/\r//g' | tr '\n' ' '
+        alias expvtt="curl $(xclip -selection clipboard -o) |
+        grep -i '[a-z]' | sed  's/\r//g' | tr '\n' ' '
