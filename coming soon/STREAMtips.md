@@ -37,6 +37,7 @@
 
     pull whole data model from Sliq, only show first 100 characters
 
+        curl $targ -L |	tr "\'" "\n" > outfile_temp &&
         grep '(?s)dataModel = \{.*?\};' outfile_temp -Poz | tail +2 | head -c 100
 
     extract embedded transcript from Sliq
@@ -50,7 +51,8 @@
         jq -c '.en[] | {Begin,Content} ' | tr "{|}" "\ " | tr ",|\"" " "
 
         # version 3
-        grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |  jq '.en | select(.Content | contains("$kw")) | {Begin, Content}'
+        grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz | \
+        jq '.en | select(.Content | contains("$kw")) | {Begin, Content}'
 
     extract transcript from VTT subtitles file
 
