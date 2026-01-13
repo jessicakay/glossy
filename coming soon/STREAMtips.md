@@ -39,10 +39,18 @@
 
         grep '(?s)dataModel = \{.*?\};' outfile_temp -Poz | tail +2 | head -c 100
 
-    extract transcript from Sliq 1
+    extract embedded transcript from Sliq
 
-        grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz | \
-        jq '.en | select(.Content | contains("$kw")) | {Begin, Content}'
+        # version 1
+        grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
+        jq |  tr "{|}'" "\n" | sed 's/^,$//g'| grep $kw | printf "\n\n"
+
+        # version 2
+        grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |
+        jq -c '.en[] | {Begin,Content} ' | tr "{|}" "\ " | tr ",|\"" " "
+
+        # version 3
+        grep '(?s)ccItems:\K\{\"en\"\:\[.*?\}\]\}' outfile_temp -Poz |  jq '.en | select(.Content | contains("$kw")) | {Begin, Content}'
 
     extract transcript from VTT subtitles file
 
@@ -62,9 +70,9 @@
         read -p "Target (url): " targ &&
         read -p "choose filename prefix: " outNAME &&
         targURL=$(curl -L $targ | tr "\'" "\n" |
-        grep "\Khttp.*?media.*?m3u?8" -Poz | tr -d '\0') &&
-        ffmpeg -i $targURL -c copy -segment_time 00:20:00 \
-        -reset_timestamps 1 -f segment $outNAME%03d.mp4
+            grep "\Khttp.*?media.*?m3u?8" -Poz | tr -d '\0') &&
+            ffmpeg -i $targURL -c copy -segment_time 00:20:00 \
+            -reset_timestamps 1 -f segment $outNAME%03d.mp4
 
     merge segments into single file and create audio-only file for easy transcription
 
