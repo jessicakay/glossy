@@ -2,7 +2,7 @@
 
 ### tips from [jessk.org/blog/streamripping-democracy](https://https://jessk.org/blog/streamripping-democracy)
 
-For background on this project, check out the [blog post](https://https://jessk.org/blog/streamripping-democracy) above. In short: while there are amazing ffmpeg wrappers like yt-dlp out there, they tend to fall short when it comes to legislative, municipal and judicial hearings, and typically don't include tools for transcription.
+For background on this project, check out the [blog post](https://https://jessk.org/blog/streamripping-democracy) above. In short: while there are amazing ffmpeg wrappers like [yt-dlp](https://github.com/yt-dlp/yt-dlp) out there, they tend to fall short when it comes to legislative, municipal and judicial hearings which run on platforms that try and limit this, and typically don't include tools for transcription.
 
 The [first section](https://github.com/jessicakay/glossy) is meant for users to follow along to the tutorial and learn the basics of archiving videos and downloading livestreams. THe second, however, contains scripts in progress for expanding these capabilities and automating the process of identifying platforms and configuring ffmpeg. You can find those [here](https://github.com/jessicakay/glossy#other-scripts).
 
@@ -75,6 +75,8 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
 ### livestream tools
 
 * these were tested on Arizona's livestream, so ymmv.
+
+* Arizona has a placeholder URL for their livestream. using the _grep -L_ location tag instructs the computer to follow the redirect to the destination, otherwise the placeholder 301 redirect page gets loaded into buffer.
 
     Download in 20 minute segments
 
