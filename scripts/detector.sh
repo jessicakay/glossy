@@ -6,7 +6,6 @@
 #
 
 
-
 printf "\n\t github.com/jessicakay/glossy\n"
 read -p $'\n\t ~ Target (url): ' targ
 read -p $'\n\t ~ choose filename prefix: ' outNAME
@@ -56,6 +55,8 @@ function grab_inv(){
 		fi
 		}
 
+unset platform_type
+
 if ! [[ -z $( echo $targ | grep "sliq" ) ]];
 	then printf "\n\t-> Sliq platform detected"
 	platform_type="sliq"
@@ -96,7 +97,7 @@ elif [[ $detect_m3u8 > 1 ]]; then
 else
 	printf "\n\t-> no playlist found...\n"
 
-	if [[ platform_type="invs" ]]; then
+	if [[ platform_type == "invs" ]]; then
 		printf "\n\t ~ grabbing identifiers...\n\n"
 		curl -s -m 10 --no-keepalive $targ > temp.txt
 		if ! [[ -z $(echo $targ | grep -Pozi "ClientID="| tr -d '\0' ) ]] && ! [[ -z $(echo $targ | grep -Pozi "eventID=" | tr -d '\0' ) ]]; then
@@ -122,5 +123,13 @@ else
 			printf "\n$new_targ\n"
 			grab_inv
 		fi
+	fi
+	if [[ $(echo $buffer | grep "SSL certificate problem" -Po)==TRUE  ]]; then
+				if ! [[ -z $(curl -sL $targ --insecure | tr "\"" "\n" | grep -P "https.*?\.[a-z]..?[^/]$" ) ]]; then
+					# add selenium/phantomjs later to harvest file locations loaded by javascript handlers
+					printf "\n\t-! likely self-hosted but no media files found\n\n\t ~ exiting... \n\n"; fi
+
+	else
+		ffmpeg -i $(curl -s $targ | grep "\Khttps.*?mp4" -oPm 1) -c copy $outNAME.mp4
 	fi
 fi

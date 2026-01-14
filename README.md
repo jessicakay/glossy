@@ -112,9 +112,9 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
 
 ## other scripts
 
-## install packages
+## install dependencies
 
-* to install advanced packages
+* to install dependencies and advanced packages for parsing JavaScript and LLM transcription
 
     > python
 
