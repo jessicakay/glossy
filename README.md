@@ -23,6 +23,14 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
 
 * advanced packages
 
+    > python
+
+            sudo apt update &&
+            sudo apt install python3-selenium
+            python -m pip install --upgrade pip
+            pip install -U openai-whisper
+
+
 ### basic scripts for downloading files
 
 * the majority of the rest of the repo are extra features wrapped around these simple comands. Copy them and paste into a text editor or directly into the terminal
