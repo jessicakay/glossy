@@ -21,16 +21,6 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
         brew update
         brew install ffmpeg jq xclip
 
-* advanced packages
-
-    > python
-
-        sudo apt update &&
-        sudo apt install python3-selenium
-        python -m pip install --upgrade pip
-        pip install -U openai-whisper
-
-
 
 ### basic scripts for downloading files
 
@@ -121,6 +111,17 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
 
 
 ## other scripts
+
+## install packages
+
+* to install advanced packages
+
+    > python
+
+        sudo apt update &&
+        sudo apt install python3-selenium
+        python -m pip install --upgrade pip
+        pip install -U openai-whisper
 
 ### examples of more complex scripts using code snippets above
 
