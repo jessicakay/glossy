@@ -14,21 +14,22 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
 
     > for apt package manager (ubuntu/debian):
 
-            sudo apt update && sudo apt install ffmpeg jq xclip
+        sudo apt update && sudo apt install ffmpeg jq xclip
 
     > for homebrew (macOS and most linux flavors):
 
-            brew update
-            brew install ffmpeg jq xclip
+        brew update
+        brew install ffmpeg jq xclip
 
 * advanced packages
 
     > python
 
-            sudo apt update &&
-            sudo apt install python3-selenium
-            python -m pip install --upgrade pip
-            pip install -U openai-whisper
+        sudo apt update &&
+        sudo apt install python3-selenium
+        python -m pip install --upgrade pip
+        pip install -U openai-whisper
+
 
 
 ### basic scripts for downloading files
