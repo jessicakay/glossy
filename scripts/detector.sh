@@ -50,7 +50,7 @@ function grab_inv(){
 			a) targ=$new_targ ; ffmpeg -i $targ -vn -ac 2 -b:a 192k $outNAME.mp3 ;;
 			v) targ=$new_targ ; ffmpeg -i $targ -c copy $outNAME.mp4 ;;
 			b) targ=$new_targ ; ffmpeg -i $targ -c copy $outNAME.mp4 &&
-				ffmpeg -i $outNAME.mp4 -c:a -acodec libmp3lame -vn $outNAME.mp3 ;;
+				ffmpeg -i $outNAME.mp4 --vn -ac 2 -b:a 192k $outNAME.mp3 ;;
 		esac
 		fi
 		}
@@ -77,7 +77,7 @@ if  [[ -n $( echo $buffer | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) ]
 			v) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -c copy $outNAME.mp4 ; return ;;
 			a) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -vn -ac 2 -b:a 192k $outNAME.mp3 ; return ;;
 			b) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -c copy $outNAME.mp4 &&
-				ffmpeg -i $outNAME.mp4 -c:a -acodec libmp3lame -vn $outname.mp3
+				ffmpeg -i $outNAME.mp4 -vn -ac 2 -b:a 192k $outNAME.mp3
 				return ;;
 			esac
 	else
