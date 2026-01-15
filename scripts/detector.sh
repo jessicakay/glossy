@@ -73,12 +73,20 @@ fi
 if  [[ -n $( echo $buffer | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) ]]; then
 	if [[ $detect_m3u8 == 1 ]]; then
 		printf "\n\t-> detected 1 stream type=m3u8\n \n\t~ attempting download...\n"
+		 if [[ $(echo $targ | grep "live" -c ) > 0 ]] || [[ $(echo $buffer | grep "live" -Po -c ) > 0 ]]; then
+			printf "\n\t-> potentially live, launch livestream ripper? "
+			read -p "[y/n]: " launch_live
+			case "$launch_live" in
+				y) source livestream_rip.sh ; return;;
+				*) printf "\n\t ~ not launching, continuing detection...";;
+			esac
+		 fi
 			case "$file_fmt" in
-			v) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -c copy $outNAME.mp4 ; return ;;
-			a) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -vn -ac 2 -b:a 192k $outNAME.mp3 ; return ;;
-			b) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -c copy $outNAME.mp4 &&
-				ffmpeg -i $outNAME.mp4 -vn -ac 2 -b:a 192k $outNAME.mp3
-				return ;;
+				v) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -c copy $outNAME.mp4 ; return ;;
+				a) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -vn -ac 2 -b:a 192k $outNAME.mp3 ; return ;;
+				b) ffmpeg -i $(curl $targ | grep "\Khttps.*?m3u?8" -oP | grep "https" | uniq ) -c copy $outNAME.mp4 &&
+					ffmpeg -i $outNAME.mp4 -vn -ac 2 -b:a 192k $outNAME.mp3
+					return ;;
 			esac
 	else
 		printf "\n\t-! stream not found... \n";
@@ -110,7 +118,7 @@ else
 		elif ! [[ -z $(echo $buffer| grep -Pozi "ClientID=" ) ]] &&  [[ -z $(echo $targ | grep -Pozi "eventID=" | tr -d '\0' ) ]]; then
 			clientid="$(cat temp.txt | tr "\'" " " | grep -Pozi "ClientID\K.*?[0-9]+" | tr -d '\0' )"
 			event_id="$(cat temp.txt | tr "\'" " " | grep -Pozi "eventID.*?\K[0-9]+[^\{\}]" -m 1 | tr -d '\0' )"
-			printf "\n\t ~ client ID $clientid\n\t ~ event ID $event_id\n"
+			printf "\n\t\t ~ client ID $clientid\n\t\t ~ event ID $event_id\n"
 			rm temp.txt
 		else
 			# some implementations use redirects, no-keepalive overrides throttling
@@ -125,11 +133,30 @@ else
 		fi
 	fi
 	if [[ $(echo $buffer | grep "SSL certificate problem" -Po)==TRUE  ]]; then
+				printf "\n\t-! SSL certificate problem detected\n"
 				if ! [[ -z $(curl -sL $targ --insecure | tr "\"" "\n" | grep -P "https.*?\.[a-z]..?[^/]$" ) ]]; then
 					# add selenium/phantomjs later to harvest file locations loaded by javascript handlers
-					printf "\n\t-! likely self-hosted but no media files found\n\n\t ~ exiting... \n\n"; fi
-
+					printf "\n\t ~ try javascript?\n"
+				fi
 	else
-		ffmpeg -i $(curl -s $targ | grep "\Khttps.*?mp4" -oPm 1) -c copy $outNAME.mp4
+		case "$platform_type" in
+			sliq | gran | invs) printf "\n\t-! error: $platform_type\n"
+				if ! [[ -z $(curl -s $targ | grep "\Khttps.*?mp4" -oPm 1) ]]; then
+					printf "\n\t-> direct mp4 download found"
+					ffmpeg -i $(curl -s $targ | grep "\Khttps.*?mp4" -oPm 1) -c copy $outNAME.mp4
+				else
+					printf "\n\t-! $platform_type detected, but no media files found\n\n\t ~ exiting... \n\n"
+					return
+				fi;;
+			*)
+				if ! [[ -z $(curl -s $targ | grep "\Khttps.*?mp4" -oPm 1) ]]; then
+					printf "\n\t-> direct mp4 download found"
+					ffmpeg -i $(curl -s $targ | grep "\Khttps.*?mp4" -oPm 1) -c copy $outNAME.mp4
+				else
+					printf "\n\t-! likely self-hosted but no media files found\n\n\t ~ exiting... \n\n"
+				fi;;
+		esac
+
+
 	fi
 fi
