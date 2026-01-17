@@ -69,6 +69,7 @@ ffmpeg -i "$targURL" -c copy \
     -f segment "$outNAME%03d.mp4" &  # & to background this and run whisper in parallel!
 ffpid=$!  # capture PID to track/kill
 
+trap 'kill "$ffpid" 2>/dev/null; exit 1' INT
 
 processed_segments=()
 while kill -0 "$ffpid" 2>/dev/null; do  # loop while ffmpeg is running
