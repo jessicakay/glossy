@@ -79,6 +79,15 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
         alias expvtt="curl $(xclip -selection clipboard -o) |
         grep -i '[a-z]' | sed  's/\r//g' | tr '\n' ' '
 
+### other transcript tools
+
+* some localities like California make direct downloading of closed captioning easy for increased accessibilty. All states should do this, but only some do.
+
+    download and search a full year of hearings and deliberations in California for immigration keywords
+
+        wget $(curl $targ | tr " " "\n" | grep -Po "http.*?.vtt") --random-wait && grep -Pi "immigration" *.vtt
+
+
 ### livestream tools
 
 * these were tested on Arizona's livestream, so ymmv.
