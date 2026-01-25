@@ -19,13 +19,14 @@ df['hour']=df['start'].str[:2]
 df['minute']=df['start'].str[4:5]
 
 df_new=df[['hour','minute','start','end','text']]
-
 print(df_new.head())
+# dfJSON=df_new.to_json(orient='records')
 
 outJSON=Path(pathy).stem+'.json'
 df_json=df_new.to_json(outJSON,orient='records', indent=4)
 
 # df_joined=df_new.to_json().join(['hour','minute'])
-#df_joined.to_json("temp.json",orient='records', indent=4)
+print("\n\nattempting to group...\n\n")
+print(df_json)
 
-# df_new.groupby(['hour'])
+print(df_new.groupby(['minute','hour']).agg({'text': list}))
