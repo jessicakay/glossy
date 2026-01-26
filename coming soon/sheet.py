@@ -14,8 +14,6 @@ pathy = filedialog.askopenfilename()
 df = pd.read_csv( pathy, header=0, skipinitialspace=True, sep=",")
 
 df['time_start']=df['start'].str[0:8]
-# df['hour']=df['start'].str[:2]
-# df['minute']=df['start'].str[4:5]
 df['hour']=pd.to_datetime(df['time_start'],format='%H:%M:%S').dt.hour
 df['minute']=pd.to_datetime(df['time_start'],format='%H:%M:%S').dt.minute
 
@@ -26,9 +24,10 @@ print("\nsaving to "+outJSON+"...\n")
 by_minute=df_new.groupby(['minute','hour'], as_index=False).agg({'text': lambda x: ' '.join(x) })
 by_minute.to_json(outJSON,orient='records', indent=4)
 
-pd.set_option('display.max_columns', None,
-              'display.max_colwidth', None,
-              'display.max_rows', None)
+pd.set_option('display.max_columns', None, 'display.max_colwidth', 100, 'display.max_rows', None)
 
-print("\n".join(by_minute['text'].str.wrap(width=80)))
-
+# print("\n".join(by_minute['text'].str.wrap(width=80)))
+first_line=by_minute.iloc[min(by_minute.index)]
+print("\nstart: \n\n",first_line['text'])
+last_line=by_minute.iloc[max(by_minute.index)]
+print("\nend: \n\n",last_line['text'])
