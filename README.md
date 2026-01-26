@@ -167,6 +167,7 @@ The [first section](https://github.com/jessicakay/glossy) is meant for users to 
         sudo apt install python3-selenium
         python -m pip install --upgrade pip
         pip install -U openai-whisper
+        sudo apt install pythonpy
 
 * some systems may require a Python virtual environment
 
