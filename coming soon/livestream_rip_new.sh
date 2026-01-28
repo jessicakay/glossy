@@ -53,10 +53,22 @@
 read -p "Target (url): " targ
 read -p "choose filename prefix: " outNAME
 read -p "save every (in mins): " segSIZE
+
 printf -v hourmins "%02d:%02d" "$((segSIZE / 60))" "$((segSIZE % 60))"
 timestamp="$hourmins:00"
-targURL=$(curl -L "$targ" | tr "\'" "\n" |
-          grep "\Khttp.*?media.*?m3u?8" -Poz | tr -d '\0')
+
+# direct MP4 link
+if [[ "$targ" =~ \.mp4($|\?) ]]; then
+    targURL="$targ"
+# direct M3U8 link
+elif [[ "$targ" =~ \.m3u8($|\?) ]]; then
+    targURL="$targ"
+# otherwise poll url for m3u8
+else
+    targURL=$(curl -Ls "$targ" | tr "'" "\n" |
+              grep -oP 'https?://[^"]+\.m3u?8' | head -n 1)
+fi
+
 if [[ -z "$targURL" ]]; then
     echo "unable to resolve URL $targ"
     exit 1
@@ -65,35 +77,54 @@ fi
 ffmpeg -i "$targURL" -c copy \
     -segment_time "$timestamp" \
     -reset_timestamps 1 \
+    -segment_list_flags +live \
     -segment_list "$outNAME.m3u8" \
     -f segment "$outNAME%03d.mp4" &  # & to background this and run whisper in parallel!
 ffpid=$!  # capture PID to track/kill
 
-trap 'kill "$ffpid" 2>/dev/null; exit 1' INT
+# wait to quit on ctrl+c until whipser is done
+trap 'kill "$ffpid" 2>/dev/null' INT
+# uncomment to exit immediately
+# trap 'kill "$ffpid" 2>/dev/null; exit 1' INT
 
 processed_segments=()
-while kill -0 "$ffpid" 2>/dev/null; do  # loop while ffmpeg is running
-    for f in ${outNAME}*.mp4; do
-        # Skip if already processed
-        if printf '%s\n' "${processed_segments[@]}" | grep -qx "$f"; then
-            continue
+final_pass_needed=0  # loop variable so we break 1 loop after ffmpeg dies
+while true; do  # loop while ffmpeg is running
+
+    # If playlist exists, process segments
+    if [[ -f "$outNAME.m3u8" ]]; then
+        # read segment names from ffmpeg playlist
+        segs=$(grep -oE "${outNAME}[0-9]+\.mp4" "$outNAME.m3u8" 2>/dev/null)
+
+        for f in $segs; do
+            # Skip if already processed
+            if printf '%s\n' "${processed_segments[@]}" | grep -qx "$f"; then
+                continue
+            fi
+
+            # uncomment to add WhisperX LLM transcription:
+            whisper "$f" \
+                --language English \
+                --model base.en \
+                --verbose True \
+                --task transcribe \
+                --output_format txt
+
+            processed_segments+=("$f")
+        done
+    fi
+
+    # Check if ffmpeg is still alive
+    if ! kill -0 "$ffpid" 2>/dev/null; then
+        # FFmpeg is dead — request one more loop
+        if (( final_pass_needed == 0 )); then
+            final_pass_needed=1
+        else
+            # We already did the final pass
+            break
         fi
+    fi
 
-        # Skip if file is still being written
-        if lsof "$f" >/dev/null 2>&1; then
-            continue
-        fi
-
-        # uncomment to add WhisperX LLM transcription:
-        whisper "$f" \
-            --language English \
-            --model base.en \
-            --verbose True \
-            --task transcribe \
-            --output_format txt
-
-        processed_segments+=("$f")
-    done
     sleep 1 # loop while ffmpeg is running
 done
 
