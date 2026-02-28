@@ -21,6 +21,8 @@ transcript_index %>% mutate(committee=str_replace(transcript_index$committee,"Jt
 transcript_index %>% mutate(committee=str_replace(transcript_index$committee,"Fi ?$","Finance")) -> transcript_index
 transcript_index %>% mutate(committee=str_replace(transcript_index$committee,"Ag ?$","Agriculture")) -> transcript_index
 
+table(transcript_index$committee,transcript_index$month) |> View()
+
 #### ------------------------------------------------------------------ ###
 
 list.files("~/glossy/transcripts/Cali/2024/",".csv") -> transcripts
